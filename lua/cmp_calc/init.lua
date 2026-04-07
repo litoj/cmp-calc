@@ -24,11 +24,6 @@ end
 source.complete = function(self, request, callback)
   local input = string.sub(request.context.cursor_before_line, request.offset)
 
-  -- Resolve math_keys
-  for _, key in ipairs(math_keys) do
-    input = string.gsub(input, vim.pesc(key), 'math.' .. key)
-  end
-
   -- Analyze column count.
   local delta = self:_analyze(input)
   if not delta then
@@ -45,7 +40,7 @@ source.complete = function(self, request, callback)
   end
 
   -- Ignore if failed to interpret to Lua.
-  local m = load('return ' .. program)
+  local m = load('return ' .. program, 'cmp-calc', 't', math)
   if type(m) ~= 'function' then
     return callback({ isIncomplete = true })
   end
